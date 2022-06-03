@@ -1,42 +1,103 @@
-class Usuario {
-    constructor (nombre, apellido, libros, mascotas){
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.libros = libros;
-        this.mascotas = mascotas;
+const fs = require('fs')
+
+class Contenedor {
+    constructor (archivo){
+        this.archivo = archivo;
     }
 
-    getFullName(){
-        return `${this.nombre}  ${this.apellido}`
+//    Recibe un objeto, lo guarda en el archivo, devuelve el id asignado
+    async save(objeto){
+        await fs.promises.writeFile(`./${this.archivo}.txt`, '')
+        let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
+    if(!data){
+        objeto.id = 1
+        const productos = [objeto]
+        await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(productos))
+       return console.log(objeto.id)
+    } else {
+        data = JSON.parse(data);
+        objeto.id = data.length + 1
+        data.push(objeto)
+        await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(data))
+        return console.log(objeto.id)
     }
-
-    addMascota (mascotaNueva){
-        this.mascotas.push(mascotaNueva)
-        
-    }
-
-    countMascotas(){
-        return this.mascotas.length 
-    }
-
-    addBook (libro, autor){
-        this.libros.push ({nombre:libro, autor:autor})
-        
-    }
-
-    geetBookName (){
- const soloNombres = this.libros.map((libros) => 
-    libros.nombre);
-        return soloNombres
-    }
-    
 }
 
-const usuario1 = new Usuario('Silvio', 'Paredes', [{nombre:'Harry Potter', autor: 'Rowling'}, {nombre:'La chica del tren', autor:'Paula Hawkins'}], ['perro', 'loro']);
+//    Recibe un ID, y devuelve el objeto con ese ID, o null sino esta
 
-usuario1.addMascota('Gallina');
-usuario1.addBook('Ruta L', 'Paula R');
+    async getById(id) {
+        try{
+            let objetoID = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
+            objetoID = JSON.parse(objetoID)
+            let otro = objetoID.find ((otro) => otro.id == id);
+            if (otro){
+            return console.log(otro)
+            }else{
+                return console.log(null)
+            }
+            
+        } catch (error) {
+            console.log (`Verificar hubo un error ${error}`)
+        }
+    }
 
-console.log(usuario1.getFullName());
-console.log(usuario1.countMascotas());
-console.log(usuario1.geetBookName());
+    //    Devuelve un array con los objetos presentes en el archivo
+
+    async getAll() {
+        try{
+            let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
+            let allData = JSON.parse(data)
+            return console.log(allData)
+        } catch (error) {
+            console.log (`Verificar hubo un error ${error}`)
+        }
+
+    }
+
+        //    Elimina del archivo el objeto con el id buscado
+
+        async deleteById(id) {
+            try{
+                let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
+                let obj = JSON.parse(data)
+                let newObj = obj.filter( obj => obj.id != id);
+                data = await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(newObj))
+            } catch {
+                console.log (`Verificar hubo un error ${error}`)
+            }
+
+        }
+
+        //    Elimina todos los objetos presentes en el archivo
+
+        async deleteAll() {
+        await fs.promises.writeFile(`./${this.archivo}.txt`, '')
+        }
+}
+
+
+const compra = new Contenedor('productos')
+
+
+// Primero se debe ingresar los productos
+
+compra.save({
+    title:'Pizza Napo', 
+    price: 700,
+    })
+
+// Se recibe un ID, y devuelve el objeto con ese ID, o null sino esta
+
+// compra.getById(1)
+
+// Se obtiene un array con los objetos presentes en el archivo
+
+// compra.getAll()
+
+// Elimina del archivo el objeto con el id buscado
+
+// compra.deleteById(1)
+
+//    Elimina todos los objetos presentes en el archivo
+
+// compra.deleteAll()
