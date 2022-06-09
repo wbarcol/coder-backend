@@ -1,40 +1,28 @@
 const fs = require('fs')
+const express = require('express')
+const app = express()
+const puerto = 8080
+
 
 class Contenedor {
     constructor (archivo){
         this.archivo = archivo;
     }
+    
+//    Entrega un producto random
 
-//    Recibe un objeto, lo guarda en el archivo, devuelve el id asignado
-    async save(objeto){
-        await fs.promises.writeFile(`./${this.archivo}.txt`, '')
-        let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
-    if(!data){
-        objeto.id = 1
-        const productos = [objeto]
-        await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(productos))
-       return console.log(objeto.id)
-    } else {
-        data = JSON.parse(data);
-        objeto.id = data.length + 1
-        data.push(objeto)
-        await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(data))
-        return console.log(objeto.id)
-    }
-}
-
-//    Recibe un ID, y devuelve el objeto con ese ID, o null sino esta
-
-    async getById(id) {
+    async getById() {
         try{
-            let objetoID = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
-            objetoID = JSON.parse(objetoID)
-            let otro = objetoID.find ((otro) => otro.id == id);
-            if (otro){
-            return console.log(otro)
-            }else{
-                return console.log(null)
-            }
+            let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
+            let allData = JSON.parse(data)
+
+            app.get('/productoRandom', (req, res) =>{
+                let maxRandom = allData.length
+                let numRandom = Math.floor(Math.random() * maxRandom) 
+                let productoRandom = allData[numRandom]
+                res.send(`<h3 style="color: red">Producto: ${productoRandom.title} precio: ${productoRandom.price} </h3>`)
+            })
+
             
         } catch (error) {
             console.log (`Verificar hubo un error ${error}`)
@@ -47,57 +35,38 @@ class Contenedor {
         try{
             let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
             let allData = JSON.parse(data)
-            return console.log(allData)
+
+            app.get('/productos', (req, res) =>{
+                res.json(allData.map(product =>
+                    `${product.title}`
+                  ).join(','))
+            })
+
         } catch (error) {
             console.log (`Verificar hubo un error ${error}`)
         }
 
     }
 
-        //    Elimina del archivo el objeto con el id buscado
-
-        async deleteById(id) {
-            try{
-                let data = await fs.promises.readFile(`./${this.archivo}.txt`, 'utf-8')
-                let obj = JSON.parse(data)
-                let newObj = obj.filter( obj => obj.id != id);
-                data = await fs.promises.writeFile(`./${this.archivo}.txt`, JSON.stringify(newObj))
-            } catch {
-                console.log (`Verificar hubo un error ${error}`)
-            }
-
-        }
-
-        //    Elimina todos los objetos presentes en el archivo
-
-        async deleteAll() {
-        await fs.promises.writeFile(`./${this.archivo}.txt`, '')
-        }
 }
 
 
 const compra = new Contenedor('productos')
+compra.getAll()
+compra.getById()
 
 
-// Primero se debe ingresar los productos
 
-compra.save({
-    title:'Pizza Napo', 
-    price: 700,
-    })
+app.get('/', (req, res) =>{
+    res.send('<h1 style="color: blue">Bienvenido al servidor</h1>')
+})
 
-// Se recibe un ID, y devuelve el objeto con ese ID, o null sino esta
 
-// compra.getById(1)
+app.listen(puerto, (error) =>{
 
-// Se obtiene un array con los objetos presentes en el archivo
-
-// compra.getAll()
-
-// Elimina del archivo el objeto con el id buscado
-
-// compra.deleteById(1)
-
-//    Elimina todos los objetos presentes en el archivo
-
-// compra.deleteAll()
+    if (!error) {
+    console.log(`el servidor se inicio en el puerto ${puerto}`)
+    } else {
+        console.log('hubo un error: ', error)
+    }
+})
