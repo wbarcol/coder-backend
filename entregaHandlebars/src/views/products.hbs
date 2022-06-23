@@ -1,0 +1,34 @@
+{{> botones}}
+
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Producto</th>
+      <th scope="col">Precio</th>
+      <th scope="col">Imagen</th>
+    </tr>
+  </thead>
+{{#if productos}}
+{{#each productos}}
+    <tbody>
+        <tr class="table-secondary">
+            <th scope="row">{{this.title}}</th>
+            <td>{{this.price}}</td>
+            <td><img src="{{this.thumbnail}}" style="width: 100px;"></td>
+        </tr>
+    </tbody>
+{{/each}}
+{{else}}
+<div class="alert alert-warning" role="alert">
+  No hay productos para mostrar
+</div>
+{{/if}}
+</table>
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+* {
+    margin: 0;
+    padding: 0;
+    color: black;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+    align-self: center;
+    line-height: normal;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+
+.botonera{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    
+}
+
+.table{
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+}
+
+.formContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+}
+
+
+form {
+    display: grid;
+    grid-template-columns: 500px;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+
+}
+
+

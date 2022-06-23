@@ -1,0 +1,24 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Imagen</th>
+        </tr>
+    </thead>
+<% if(productos.length) { %>
+    <% productos.forEach(Producto=> { %>
+        <tbody>
+            <tr class="table-secondary">
+                <th scope="row"> <%- Producto.title %></th>
+                <td> <%- Producto.price %></td>
+                <td><img src=" <%- Producto.thumbnail %>" style="width: 100px;"></td>
+            </tr>
+        </tbody>
+    <% }) %>
+<% } else { %>
+  <div class="alert alert-warning" role="alert">
+    No hay productos para mostrar
+  </div>
+  <% } %> 
+  </table>
