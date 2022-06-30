@@ -54,9 +54,9 @@ function sendMessage(infoMessage) {
 
 formMessage.addEventListener('submit', event => {
     event.preventDefault()
-    const timeStamp = new Date();
-    const fechayhora = timeStamp.toLocaleString("fr-FR");
-    const infoMessage = { username: usernameInput.value, time: fechayhora, message: messageInput.value }
+    const fecha = new Date();
+    const fechaHora = fecha.toLocaleString("fr-FR");
+    const infoMessage = { username: usernameInput.value, time: fechaHora, message: messageInput.value }
     sendMessage(infoMessage)
 })
 
