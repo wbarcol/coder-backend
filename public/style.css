@@ -13,22 +13,20 @@ a {
     color: inherit;
 }
 
-
-
-.botonera{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px;
-    align-items: center;
-    justify-items: center;
+.titulos{
+    color: blue;
     text-align: center;
-    
+    padding: 20px;
+
 }
+
+
 
 .table{
     align-items: center;
     justify-items: center;
     text-align: center;
+
 }
 
 .formContainer {
@@ -38,6 +36,8 @@ a {
     align-items: center;
     justify-items: center;
     text-align: center;
+    padding-bottom: 40px;
+    padding-top:40px;
 }
 
 
@@ -49,3 +49,15 @@ form {
 }
 
 
+.mUser{
+    font-weight: bold;
+    color: blue;
+}
+.mDate{
+    color: brown;
+}
+
+.mMessage{
+    font-style: italic;
+    color: green;
+}
