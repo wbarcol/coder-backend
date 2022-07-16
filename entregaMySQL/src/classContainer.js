@@ -1,4 +1,5 @@
-const database = require('../DB/database')
+const database = require('./DB/database').mysqlConnection
+
 
 
 class Productos {
@@ -16,11 +17,10 @@ class Productos {
             await database(this.table).insert(products)
     
             console.log('products inserted!')
-    
-            database.destroy()
+
         } catch(err) {
             console.log(err)
-            database.destroy()
+
         }
     }
 
@@ -31,10 +31,19 @@ async selecProduct(){
         const productsFromDatabase = await database.from(this.table).select('*')
         return productsFromDatabase
 
-        database.destroy()
+        // database.destroy()
     } catch(err) {
-        console.log(err)
-        database.destroy()
+        
+        if (err.errno === 1146) {
+            /* no existe la tabla */
+            const createTable = require("./DB/create_product_table")
+            await createTable;
+            console.log(`Tabla ${this.table} creada`)
+            return []
+        } else{
+            console.log("Error: ", err)
+            return {error: "error buscando producto"}
+        }
     }
 }
 

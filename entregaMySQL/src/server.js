@@ -15,17 +15,15 @@ const expressServer = app.listen(puerto, (error) => {
     }
 })
 
-const Contenedor = require('./classProduct');
-archivoChats = new Contenedor('archivoChats');
+const ContenedorChat = require('./classChat');
+archivoChats = new ContenedorChat ('chat');
 
 
-const createdDB = require('../DB/create_product_table');
+
 const Productos = require('./classContainer.js');
 archivoP = new Productos ('product');
-newTable = createdDB()
 
-const messageArray = [];
-const productos = archivoP.selecProduct()
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -34,14 +32,19 @@ app.use(express.static(path.join(__dirname, '../public')))
 const io = new IOServer(expressServer)
 
 //Productos
-io.on('connection', socket => {
+io.on('connection', async socket => {
+
+    let mensajes = await archivoChats.selectMsg();
+    let productos = await archivoP.selecProduct() 
+
     console.log(`se conecto un nuevo cliente ${socket.id}`)
 
     socket.emit('server:products', productos)
 
-    socket.on('client:product', infoProduct => {
+    socket.on('client:product', async infoProduct => {
 
-        archivoP.insertProduct(infoProduct);
+       await archivoP.insertProduct(infoProduct);
+        productos = await archivoP.selecProduct()
         io.emit('server:products', productos);
     })
 
@@ -49,12 +52,12 @@ io.on('connection', socket => {
     
     //CHAT
 
-    socket.emit('server:message', messageArray);
+    socket.emit('server:message', mensajes);
 
-    socket.on('client:message', infoMessage => {
-        messageArray.push(infoMessage);
-        archivoChats.save(infoMessage);
-        io.emit('server:message', messageArray)
+    socket.on('client:message', async infoMessage => {
+        await archivoChats.saveMsg(infoMessage);
+        mensajes = await archivoChats.selectMsg();
+        io.emit('server:message', mensajes )
     })
 })
 

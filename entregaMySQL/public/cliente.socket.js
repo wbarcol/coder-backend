@@ -1,7 +1,7 @@
 const socket = io()
-// const titleP = document.querySelector('#titleP')
-// const priceP = document.querySelector('#priceP')
-// const thumP = document.querySelector('#thumP')
+const titleP = document.querySelector('#titleP')
+const priceP = document.querySelector('#priceP')
+const thumP = document.querySelector('#thumP')
 //Mensajes
 const formMessage = document.querySelector('#formMessage')
 const usernameInput = document.querySelector('#usernameInput')

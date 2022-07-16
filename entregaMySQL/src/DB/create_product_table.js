@@ -1,9 +1,9 @@
-const database = require('./database')
+const database = require('./database').mysqlConnection
 
 const createProductTable = async () => {
     try {
 
-        await database.schema.dropTableIfExists('product')
+        // await database.schema.dropTableIfExists('product')
         
         await database.schema.createTable('product', productTable => {
             productTable.increments('id').primary()
@@ -13,11 +13,11 @@ const createProductTable = async () => {
         })
         console.log('product table created!')
 
-        database.destroy()
+
 
     } catch(err) {
         console.log(err)
-        database.destroy()
+
     }
 }
 
