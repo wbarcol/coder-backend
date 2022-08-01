@@ -1,8 +1,8 @@
-import ContenedorMongo from "../../contenedor";
+import ContenedorMongo from "../../contenedorMongo.js";
 
 class ProductoDaoMongo extends ContenedorMongo {
   constructor() {
-    super("productos", {
+    super("producto", {
       nombre: { type: String, required: true },
       precio: { type: Number, required: true },
       thumbnail: { type: String, required: true },

@@ -1,10 +1,10 @@
-import { ProductoDao } from "../DAOS/PRODUCTOS/productoDaoMongo.js";
+import { ProductoDao } from "../daos/index.js";
 
 
 //PRODUCTOS//
 
 const getAllProducts = async (req, res)=>{
-        res.send( await ProductoDao.getAll());
+        res.json( await ProductoDao.getAll());
 }
 
 
@@ -19,8 +19,7 @@ const getProduct = async (req, res) => {
 
 const postProduct = async (req, res) => {
     try {
-        await ProductoDao.addProduct(req.body);
-        res.sendStatus(200);
+        res.json(await ProductoDao.addProduct(req.body));
     } catch (error) {
         console.log(`Verificar hubo un error ${error}`)
         res.sendStatus(500);
@@ -51,4 +50,4 @@ export { getAllProducts,
     getProduct, 
     postProduct,
     putProduct, 
-    deleteProduct, };
+    deleteProduct };

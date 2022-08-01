@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
-import dbConfig from "../dbConfig.js";
+import dbConfig from "./dbConfig.js";
 
-await mongoose.connect(dbConfig.mongodb.connectionString);
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+
+await mongoose.connect(dbConfig.mongo.connectionString);
 console.log("Conexión establecida con Mongo")
 
 
@@ -11,9 +16,24 @@ class ContenedorMongo {
         this.collection = mongoose.model(collectionName, new mongoose.Schema(schema));
     }
 
-/////////////////////////////////PRODUCTOS///////////////////////////////////////////////
+//PRODUCTOS//
 
-    //    READ:  Devuelve un array con los productos presentes en el archivo
+    //    CREATE: 
+
+    async addProduct (producto) {
+        try{
+            const newProd = new this.collection(producto)
+            await newProd.save()
+            return newProd;
+        } catch (err) {
+
+            console.log(`Verificar hubo un error ${err}`);
+        }
+    }
+
+
+
+    //    READ: 
 
     async getAll() {
 
@@ -28,75 +48,128 @@ class ContenedorMongo {
 
     }
 
-       //    Devuelve un producto por su ID
+       //    READ: (ID)
 
     async getById (id) {
-        let data = await fs.promises.readFile(`./src/utils/${this.archivo}.json`, 'utf-8')
-        let allData = JSON.parse(data)
-        let resultado = 'Producto no encontrado'
+        try {
+            const doc = await this.collection.find({_id:id}, { __v: 0 });            
+            if(doc){
+                return doc
+            }
+          } catch(err){
+            return {error: "Producto no encontrado"};
+        }
+    }
 
-        let productoEncontrado = allData.find(producto => producto.id == id);
-        if(!productoEncontrado){
-            return resultado
-        }else{
-            return(productoEncontrado);
+
+           //    UPDATE:
+
+        async editProd (id, productInfo) {
+            try {
+                
+                const doc = await this.collection.updateOne({_id:id}, {$set: productInfo});
+                return doc;
+            } catch(err){
+                return {error: err};
+            }
         }
 
+            //    DELETE:
+
+            async deletePr (id){
+            try {
+                const doc = await this.collection.deleteOne({_id:id});
+                return doc;
+            } catch(err){
+                return {error: err};
+            }
+        }
+        
+
+
+/////////////////////////////////CARRITO///////////////////////////////////////////////
+
+    //    CREATE: Crea el carrito cuando se agrega un producto
+
+    async addCart (productosDB) {
+        try{
+            let timestamp = new Date;
+            const cart = { timestamp: timestamp, productos: productosDB };
+            const newCart = new this.collection(cart)
+            await newCart.save()
+            return newCart
+
+            return (newCart)
+        } catch (err) {
+
+            return {error: err};
+        }
     }
 
-    // AGREAGAR PRODUCTO
+    //CREATE: agrega productos al carrito existente
 
-    async addProduct (producto) {
-        producto.timestamp = new Date().toLocaleString("fr-FR");
-        let data = await fs.promises.readFile(`./src/utils/${this.archivo}.json`, 'utf-8')
-        let allData = JSON.parse(data)
-        let ultimo = allData.length -1;
-        producto.id = allData[ultimo].id +1;
-        allData.push(producto);
-        await fs.promises.writeFile(`./src/utils/${this.archivo}.json`, JSON.stringify(allData));
-        return producto
+    async addPrCart (IDCart, productosDB) {
+        
+        try{
+            const productoDB = productosDB[0]
+        const cart = await this.collection.findOne({_id:IDCart}, { __v: 0 })
+        cart.productos.push(productoDB)
+        const cartUp = new this.collection(cart)
+        await cartUp.save()
+        return cartUp
+        } catch(err){
+            return {error: err};
+        }
+    
+
     }
 
-    /// EDITAR PRODUCTO
+           //    READ: (ID) muestra el carrito por su ID
 
-    async editProd (id, productInfo) {
-        let data = await fs.promises.readFile(`./src/utils/${this.archivo}.json`, 'utf-8')
-        let allData = JSON.parse(data)
-        let productoEncontrado = allData.find(producto => producto.id == id);
-        let resultado = 'Producto no encontrado'
+           async cartById (id) {
+        
+            try{
+                const objetos = await this.collection.findOne({_id:id}, { __v: 0 })
+                return objetos;
+            } catch(err){
+                return {error: "error buscando en coleccion"};
+            }
+        
+    
+        }
 
-        if(!productoEncontrado){
-            return resultado
-        } else {
 
-        let indiceProducto = allData.findIndex((producto) => producto.id == id);
-        allData[indiceProducto] = productInfo
-        allData[indiceProducto].id = id
-        allData[indiceProducto].timestamp = new Date().toLocaleString("fr-FR");
-        await fs.promises.writeFile(`./src/utils/${this.archivo}.json`, JSON.stringify(allData));
-        let resultado = 'Producto editado';
-        return resultado
+
+
+//   DETELE: 
+//Elimina el carrito por su ID
+async cartDelete (id) {
+    try {
+        const doc = await this.collection.deleteOne({_id:id});
+        return ('Carrito Eliminado')
+    } catch(err){
+        return {error: err};
     }
+} 
+
+//Elimina productos por su ID del carrito por su id
+    async deleteProCart (IDCart, IDproducto) {
+        
+        try{
+            const objetos = await this.collection.findOne({_id:IDCart}, { __v: 0 })
+            let newData = objetos.productos
+            let cartActualizado = newData.filter(producto => producto._id != IDproducto);
+            objetos.productos = cartActualizado;
+
+            return (objetos)
+        } catch(err){
+            return {error: err};
+        }
+    
+    }
+
+
 }
 
 
-
-    // ELIMINAR PRODUCTO
-
-    async deletePr (id) {
-        let data = await fs.promises.readFile(`./src/utils/${this.archivo}.json`, 'utf-8')
-        let allData = JSON.parse(data)
-        let productoEncontrado = allData.find(producto => producto.id == id);
-        let resultado = 'Producto no encontrado'
-
-        if(!productoEncontrado){
-            return resultado
-        } else {
-
-        let productosActualizados = allData.filter(producto => producto.id != id);
-        await fs.promises.writeFile(`./src/utils/${this.archivo}.json`, JSON.stringify(productosActualizados));
-        let resultado = 'Producto eliminado';
-        return resultado
-    }
-}
-}
+export default ContenedorMongo;

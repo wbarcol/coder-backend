@@ -3,33 +3,33 @@ import dotenv from "dotenv";
 dotenv.config();
 
 let ProductoDao;
-let CarritoDao;
+let cartDao;
 
 switch (process.env.DATABASE) {
   case "firebase":
     const { default: ProductoDaoFirebase } = await import(
-      "./productos/productoDaoFirebase"
+      "./productos/productoDaoFirebase.js"
     );
     const { default: CarritoDaoFirebase } = await import(
-      "./carritos/carritoDaoFirebase"
+      "./carritos/carritoDaoFirebase.js"
     );
 
-    ProductoDao = ProductoDaoFirebase;
-    CarritoDao = CarritoDaoFirebase;
+    ProductoDao = new ProductoDaoFirebase();
+    cartDao = new CarritoDaoFirebase();
 
     break;
   case "mongo":
     const { default: ProductoDaoMongo } = await import(
-      "./productos/productoDaoMongo"
+      "./productos/productoDaoMongo.js"
     );
     const { default: CarritoDaoMongo } = await import(
-      "./carritos/carritoDaoMongo"
+      "./carritos/carritoDaoMongo.js"
     );
 
-    ProductoDao = ProductoDaoMongo;
-    CarritoDao = CarritoDaoMongo;
+    ProductoDao = new ProductoDaoMongo();
+    cartDao = new CarritoDaoMongo();
 
     break;
 }
 
-export { ProductoDao, CarritoDao };
+export { ProductoDao, cartDao };
